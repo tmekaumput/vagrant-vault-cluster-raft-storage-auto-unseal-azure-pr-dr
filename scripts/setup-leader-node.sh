@@ -16,8 +16,16 @@ if [[ "${INITIALIZED}" == "false" ]]; then
   RECOVERY_KEY=$(echo "$INIT_RESPONSE" | jq -r .recovery_keys_b64[0])
   VAULT_TOKEN=$(echo "$INIT_RESPONSE" | jq -r .root_token)
 
-  echo "$RECOVERY_KEY" > ${SHARED_DIR}/recovery_key-vault
-  echo "$VAULT_TOKEN" > ${SHARED_DIR}/root_token-vault
+  sudo tee ${SHARED_DIR}/recovery_key-vault <<EOF
+$RECOVERY_KEY
+EOF
+
+  sudo tee ${SHARED_DIR}/root_token-vault <<EOF
+$VAULT_TOKEN
+EOF
+
+  sudo chown vault:vault ${SHARED_DIR}/recovery_key-vault
+  sudo chown vault:vault ${SHARED_DIR}/root_token-vault
 
   printf "\n%s" \
     "[vault] Recovery key: $RECOVERY_KEY" \
